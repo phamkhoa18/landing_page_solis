@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
 import Vcard from '../../../../../models/Vcard'
 import connectDB from '../../../../../lib/mongodb'
 import path from 'path';
-import fs from 'fs';
 import sharp from 'sharp';
 import slugify from 'slugify';
+import fs from 'fs';
 // Tắt bodyParser của Next.js
 export const config = {
   api: {
@@ -31,29 +32,53 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = await params
-    await connectDB()
+    const { id } = await params;
+    await connectDB();
     
     // Đọc formData từ request
-    const data = await req.formData()
+    const data = await req.formData();
     
     // Kiểm tra Vcard tồn tại
-    const existingVcard = await Vcard.findById(id)
+    const existingVcard = await Vcard.findById(id);
     if (!existingVcard) {
-      return NextResponse.json({ error: 'Vcard not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Vcard not found' }, { status: 404 });
     }
 
     // Lấy giá trị và đảm bảo không rỗng
-    const vcardName = data.get('vcardName') as string
-    const name = data.get('name') as string
+    const vcardName = data.get('vcardName') as string;
+    const name = data.get('name') as string;
 
     if (!vcardName || !name) {
-      console.error('Missing required fields: vcardName or name')
-      return new Response('Missing required fields: vcardName or name', { status: 400 })
+      console.error('Missing required fields: vcardName or name');
+      return new Response('Missing required fields: vcardName or name', { status: 400 });
     }
 
     // Chuẩn bị dữ liệu cập nhật
-    const updateData = {
+    const updateData: {
+      vcardName: string;
+      name: string;
+      slug: string;
+      lastname: string;
+      phone: string;
+      altPhone: string;
+      email: string;
+      website: string;
+      company: string;
+      profession: string;
+      summary: string;
+      street: string;
+      postal: string;
+      city: string;
+      state: string;
+      country: string;
+      facebook: string;
+      instagram: string;
+      zalo: string;
+      whatsapp: string;
+      primaryColor: string;
+      secondaryColor: string;
+      image?: string | null; // Đảm bảo thêm image vào kiểu dữ liệu
+    } = {
       vcardName: vcardName,
       name: name,
       slug: (data.get('slug') as string) || existingVcard.slug,
@@ -76,26 +101,26 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       whatsapp: (data.get('whatsapp') as string) ?? existingVcard.whatsapp,
       primaryColor: (data.get('primaryColor') as string) ?? existingVcard.primaryColor,
       secondaryColor: (data.get('secondaryColor') as string) ?? existingVcard.secondaryColor,
-    }
+    };
 
     // Xử lý image
-    const image = data.get('image') as File
-    let imagePath: string | null = existingVcard.image
+    const image = data.get('image') as File;
+    let imagePath: string | null = existingVcard.image;
     if (image && image.size > 0) {
-      const arrayBuffer = await image.arrayBuffer()
-      const buffer = Buffer.from(arrayBuffer)
+      const arrayBuffer = await image.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
       
-      const fileName = `${Date.now()}-${Math.floor(Math.random() * 1e9)}-vcard.png`
-      const filePath = path.join(process.cwd(), 'public', 'uploads', fileName)
+      const fileName = `${Date.now()}-${Math.floor(Math.random() * 1e9)}-vcard.png`;
+      const filePath = path.join(process.cwd(), 'public', 'uploads', fileName);
 
       await sharp(buffer)
         .png()
-        .toFile(filePath)
+        .toFile(filePath);
 
-      imagePath = `/uploads/${fileName}`
+        fs.chmodSync(filePath, '0666'); // Quyền đọc/ghi cho tất cả
+
+      imagePath = `/uploads/${fileName}`;
     }
-
-    // Xử lý welcomeImage
 
     // Tạo slug nếu không có
     if (!updateData.slug) {
@@ -103,27 +128,27 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         lower: true,
         strict: true,
         locale: 'vi'
-      })
+      });
     }
 
     // Cập nhật dữ liệu
-    updateData.image = imagePath
+    updateData.image = imagePath;
 
     const updatedVcard = await Vcard.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true
-    })
+    });
 
     return NextResponse.json(
       { message: 'Vcard updated successfully', vcard: updatedVcard },
       { status: 200 }
-    )
+    );
   } catch (error: any) {
-    console.error('Error updating vcard:', error)
+    console.error('Error updating vcard:', error);
     return NextResponse.json(
       { error: error.message || 'Internal server error' },
       { status: 500 }
-    )
+    );
   }
 }
 

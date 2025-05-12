@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import {
   Card,
@@ -20,6 +21,13 @@ import { getCroppedImg } from './cropImage' // Utility function for cropping
 import { showError, showSuccess } from "./NotificationOverlay"
 import { useRouter } from "next/navigation"
 
+
+interface Area {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 
 export default function VcardPage() {
@@ -75,7 +83,8 @@ export default function VcardPage() {
   const [imageSrc, setImageSrc] = useState<string | null>(null)
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+
   const [isCropping, setIsCropping] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -100,7 +109,7 @@ export default function VcardPage() {
     }
   }
 
-  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+  const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area)=> {
     setCroppedAreaPixels(croppedAreaPixels)
   }, [])
 
@@ -163,7 +172,6 @@ export default function VcardPage() {
         vcardName: '',
         slug: '',
         name: '',
-        lastname: '',
         phone: '',
         altPhone: '',
         email: '',

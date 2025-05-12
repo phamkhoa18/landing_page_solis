@@ -1,10 +1,10 @@
-"use client";
-import { toast } from "sonner";
-import { CheckCircle, XCircle } from "lucide-react";
-import { cn } from "@/lib/utils"; // nếu bạn có classnames helper
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { toast } from "sonner"
+import { CheckCircle, XCircle } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 export function showSuccess(message: string) {
-  toast.custom((t) => (
+  toast.custom((t: any) => (
     <div
       className={cn(
         "flex items-center gap-3 rounded-lg border border-green-300 bg-green-50 p-4 shadow-md transition-all",
@@ -17,11 +17,11 @@ export function showSuccess(message: string) {
         <span className="text-green-700 text-sm">Tác vụ đã hoàn tất thành công 🎉</span>
       </div>
     </div>
-  ));
+  ))
 }
 
 export function showError(message: string) {
-  toast.custom((t) => (
+  toast.custom((t: any) => (
     <div
       className={cn(
         "flex items-center gap-3 rounded-lg border border-red-300 bg-red-50 p-4 shadow-md transition-all",
@@ -34,5 +34,5 @@ export function showError(message: string) {
         <span className="text-red-700 text-sm">Đã có lỗi xảy ra 😓</span>
       </div>
     </div>
-  ));
+  ))
 }

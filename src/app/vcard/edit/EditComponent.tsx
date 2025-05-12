@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 import {
   Card,
@@ -15,7 +17,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { RotateCcw, ChevronDown, ChevronUp, Settings } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from "next/link"
-import Cropper from 'react-easy-crop'
+import Cropper  from 'react-easy-crop'
 import { showError, showSuccess } from "../NotificationOverlay"
 import { useRouter } from 'next/navigation'
 import { getCroppedImg } from "../cropImage"
@@ -48,7 +50,15 @@ interface Vcard {
   socials: string[]
 }
 
+interface Area {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export default function EditComponent({ id }: { id: string }) {
+
   const router = useRouter()
   const colorSchemes = [
     { primary: '#4A90E2', secondary: '#ffffff' },
@@ -65,6 +75,7 @@ export default function EditComponent({ id }: { id: string }) {
 
   const [selectedScheme, setSelectedScheme] = useState(colorSchemes[5])
   const [selectedSocials, setSelectedSocials] = useState<string[]>([])
+  
   const [isOpenMap, setIsOpenMap] = useState({
     vcard: true,
     design: true,
@@ -103,7 +114,7 @@ export default function EditComponent({ id }: { id: string }) {
   const [existingImage, setExistingImage] = useState<string | null>(null)
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isCropping, setIsCropping] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -144,12 +155,14 @@ export default function EditComponent({ id }: { id: string }) {
         })
         setSelectedSocials(data.socials || [])
         setExistingImage(data.image || null)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         showError('Không thể tải dữ liệu Vcard')
         setError(err.message || 'Đã xảy ra lỗi khi tải dữ liệu')
       }
     }
-    fetchVcard()
+
+    fetchVcard() ;
   }, [id])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -171,9 +184,9 @@ export default function EditComponent({ id }: { id: string }) {
     }
   }
 
-  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels)
-  }, [])
+  const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
+  setCroppedAreaPixels(croppedAreaPixels);
+}, []);
 
   const handleCrop = useCallback(async () => {
     try {
