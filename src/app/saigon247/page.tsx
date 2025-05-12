@@ -89,7 +89,7 @@ export default function Saigon247TourPage() {
     console.log(data);
     
 
-    fetch('http://saigon247.au/api/addform', {
+    fetch('https://saigon247.au/api/addform', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
