@@ -504,7 +504,11 @@ export default function EditComponent({ id }: { id: string }) {
                               </motion.div>
                               {(image || existingImage) && (
                                 <motion.img
-                                  src={image ? URL.createObjectURL(image) : existingImage || ''}
+                                  src={
+                                    image
+                                      ? URL.createObjectURL(image)
+                                      : `${process.env.NEXT_PUBLIC_LINK_IMAGE}${existingImage}`
+                                  }
                                   alt="Preview"
                                   className="mt-2 max-w-[120px] max-h-[120px] rounded-md object-cover aspect-square"
                                   initial={{ opacity: 0 }}

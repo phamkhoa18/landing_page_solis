@@ -2,10 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Vcard from '../../../../../models/Vcard'
 import connectDB from '../../../../../lib/mongodb'
-import path from 'path';
-import sharp from 'sharp';
 import slugify from 'slugify';
-import fs from 'fs';
 // Tắt bodyParser của Next.js
 export const config = {
   api: {
@@ -103,23 +100,28 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       secondaryColor: (data.get('secondaryColor') as string) ?? existingVcard.secondaryColor,
     };
 
-    // Xử lý image
+        // Xử lý image
     const image = data.get('image') as File;
     let imagePath: string | null = existingVcard.image;
+
     if (image && image.size > 0) {
-      const arrayBuffer = await image.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      
-      const fileName = `${Date.now()}-${Math.floor(Math.random() * 1e9)}-vcard.png`;
-      const filePath = path.join(process.cwd(), 'public', 'uploads', fileName);
+      const buffer = Buffer.from(await image.arrayBuffer());
 
-      await sharp(buffer)
-        .png()
-        .toFile(filePath);
+      // Gửi ảnh sang server upload
+      const form = new FormData();
+      form.append('image', new Blob([buffer]), 'vcard.png');
 
-        fs.chmodSync(filePath, '0666'); // Quyền đọc/ghi cho tất cả
+      const uploadRes = await fetch(`${process.env.NEXT_PUBLIC_LINK_IMAGE}/upload`, {
+        method: 'POST',
+        body: form
+      });
 
-      imagePath = `/uploads/${fileName}`;
+      if (!uploadRes.ok) {
+        throw new Error('Upload image failed');
+      }
+
+      const result = await uploadRes.json();
+      imagePath = result.url; // Nhận URL từ server.js trả về, ví dụ: /uploads/xyz.png
     }
 
     // Tạo slug nếu không có

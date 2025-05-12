@@ -92,7 +92,7 @@ export default function SolisPage() {
         };
         
         // Gửi dữ liệu qua API
-        fetch('https://saigon247.au/api/addform', {
+        fetch('http://saigon247.au/api/addform', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

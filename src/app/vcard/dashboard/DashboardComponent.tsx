@@ -42,7 +42,8 @@ function VcardSkeleton() {
 
 
 export default function DashboardComponent() {
-    const [vcards, setVcards] = useState<Vcard[]>([])
+  
+  const [vcards, setVcards] = useState<Vcard[]>([])
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [, setShowDialog] = useState(false)
   const [selectedVcardId, setSelectedVcardId] = useState<string | null>(null)
@@ -53,7 +54,7 @@ export default function DashboardComponent() {
       try {
         setLoading(true)
         const res = await fetch('/api/vcard')
-        const data = await res.json()
+        const data = await res.json()        
         setVcards(data)
       } catch (error) {
         console.error('Failed to fetch vcards:', error)
@@ -118,7 +119,7 @@ export default function DashboardComponent() {
                   <div className="flex items-center gap-4">
                     {vcard.image ? (
                       <Image
-                        src={vcard.image}
+                        src={`${process.env.NEXT_PUBLIC_LINK_IMAGE}${vcard.image}`}
                         alt={vcard.name}
                         width={48}
                         height={48}

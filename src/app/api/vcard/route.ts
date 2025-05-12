@@ -2,10 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Vcard from '../../../../models/Vcard';
 import connectDB from '../../../../lib/mongodb';
-import path from 'path';
-import sharp from 'sharp';
 import slugify from 'slugify';
-import fs from 'fs';
 import mime from 'mime-types';  // Thêm thư viện mime-types để kiểm tra kiểu dữ liệu
 
 // Tắt bodyParser của Next.js
@@ -56,33 +53,31 @@ export async function POST(request: NextRequest) {
     const image = data.get('image') as File;
     let imagePath: string | null = null;
 
-    // Kiểm tra ảnh trước khi xử lý
     if (image) {
       const mimeType = mime.lookup(image.name);
       if (!mimeType || !mimeType.startsWith('image')) {
-        console.error('Uploaded file is not an image', mimeType);
         return new Response('Uploaded file is not an image', { status: 400 });
       }
 
-      const arrayBuffer = await image.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      const formData = new FormData();
+      formData.append('image', image);
 
-      const fileName = `${Date.now()}-${Math.floor(Math.random() * 1e9)}-vcard.png`;
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+      const uploadRes = await fetch('http://localhost:4000/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-      // Tạo thư mục nếu chưa tồn tại
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
+      const uploadData = await uploadRes.json();
+
+      if (!uploadRes.ok) {
+        console.error('Upload server error:', uploadData.error);
+        return new Response('Image upload failed', { status: 500 });
       }
 
-      const filePath = path.join(uploadDir, fileName);
-      console.log('Saving image to:', filePath);
+      console.log(uploadData);
+      
 
-      await sharp(buffer).png().toFile(filePath);
-      fs.chmodSync(filePath, 0o666); // quyền đọc/ghi cho mọi user
-
-      // Lưu đường dẫn tương đối vào DB (sau này truy cập qua API hoặc route proxy)
-      imagePath = `/uploads/${fileName}`;
+      imagePath = uploadData.url;
     }
 
     if (!vcard.slug || vcard.slug === '') {

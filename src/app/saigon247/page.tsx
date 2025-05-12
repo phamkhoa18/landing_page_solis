@@ -2,7 +2,7 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion} from "framer-motion";
 import md5 from 'md5';
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -34,12 +34,6 @@ const containerVariants = {
 const formVariants = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.8, delay: 0.3 } },
-};
-
-const modalVariants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
-  exit: { opacity: 0, scale: 0.8 },
 };
 
 export default function Saigon247TourPage() {
@@ -89,13 +83,13 @@ export default function Saigon247TourPage() {
       name: values.username,
       title: 'THÔNG TIN KHÁCH HÀNG TOUR ÚC',
       content: JSON.stringify(arraycontent),
-      position: 'saigon247',
+      posision : 'saigon247',
     };
 
     console.log(data);
     
 
-    fetch('https://saigon247.au/api/addform', {
+    fetch('http://saigon247.au/api/addform', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -107,7 +101,7 @@ export default function Saigon247TourPage() {
         })
       .then((response) => response.json())
       .then((data) => {
-        if (data.status === '200') {
+        if (data.status == '200') {
           setShowSuccess(true);
           form.reset();
         } else {
@@ -326,51 +320,63 @@ export default function Saigon247TourPage() {
           </Form>
         </motion.div>
       </div>
-      <AnimatePresence>
-        {showSuccess && (
+      {showSuccess && (
           <motion.div
-            key="success"
-            variants={modalVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="fixed inset-0 flex items-center justify-center bg-black/50 z-99"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
           >
-            <div className="bg-white p-6 rounded-xl text-center shadow-xl">
-              <h2 className="text-2xl font-semibold text-green-500">Thành công!</h2>
-              <p className="mt-2 text-gray-700">Cảm ơn bạn đã đăng ký. Chúng tôi sẽ liên hệ với bạn sớm nhất!</p>
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white p-8 rounded-2xl shadow-2xl w-[90%] max-w-md text-center"
+            >
+              <div className="text-green-500 text-4xl mb-4">🎉</div>
+              <h2 className="text-2xl font-bold text-green-600">Đăng ký thành công!</h2>
+              <p className="text-base text-gray-700 mt-3">
+                Cảm ơn bạn đã đăng ký. Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.
+              </p>
               <Button
                 onClick={() => setShowSuccess(false)}
-                className="mt-4 bg-gradient-to-r cursor-pointer from-pink-500 to-purple-600 text-white"
+                className="mt-6 bg-green-500 hover:bg-green-400 text-white px-6 py-3 rounded-xl transition-all shadow-md"
               >
                 Đóng
               </Button>
-            </div>
+            </motion.div>
           </motion.div>
         )}
 
-        {showError && (
+      {showError && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+        >
           <motion.div
-            key="error"
-            variants={modalVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="fixed inset-0 flex items-center justify-center bg-black/50 z-99"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white p-8 rounded-2xl shadow-2xl w-[90%] max-w-md text-center"
           >
-            <div className="bg-white p-6 rounded-xl text-center shadow-xl">
-              <h2 className="text-2xl font-semibold text-red-500">Lỗi!</h2>
-              <p className="mt-2 text-gray-700">Đã có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại sau.</p>
-              <Button
-                onClick={() => setShowError(false)}
-                className="mt-4 bg-gradient-to-r cursor-pointer from-pink-500 to-purple-600 text-white"
-              >
-                Đóng
-              </Button>
-            </div>
+            <div className="text-red-500 text-4xl mb-4">❌</div>
+            <h2 className="text-2xl font-bold text-red-600">Gửi không thành công!</h2>
+            <p className="text-base text-gray-700 mt-3">
+              Có lỗi xảy ra trong quá trình gửi thông tin. Vui lòng thử lại sau.
+            </p>
+            <Button
+              onClick={() => setShowError(false)}
+              className="mt-6 bg-red-500 hover:bg-red-400 text-white px-6 py-3 rounded-xl transition-all shadow-md"
+            >
+              Đóng
+            </Button>
           </motion.div>
-        )}
-      </AnimatePresence>
+        </motion.div>
+      )}
     </div>
     </>
   );

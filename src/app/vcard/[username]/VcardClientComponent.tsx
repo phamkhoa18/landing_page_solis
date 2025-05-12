@@ -120,7 +120,7 @@ export default function VcardClientComponent({ username }: { username: string })
                                 <div className="avatar w-fit">
                                     {vcard.image ? (
                                         <Image
-                                        src={vcard.image}
+                                        src={`${process.env.NEXT_PUBLIC_LINK_IMAGE}${vcard.image}`}
                                         alt={vcard.name}
                                         className="rounded-xl"
                                         width={120}
