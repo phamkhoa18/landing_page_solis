@@ -53,7 +53,6 @@ export default function VcardClientComponent({ username }: { username: string })
       const response = await fetch(`/api/vcard/detail/${username}`);
       const data = await response.json();
       console.log(data);
-      
       setVcard(data);
     const root = document.documentElement;
     root.style.setProperty('--primary', data.primaryColor); // Cập nhật giá trị biến
@@ -62,6 +61,26 @@ export default function VcardClientComponent({ username }: { username: string })
     
     fetchVcard();
   }, [username]);
+
+    const handleContact = (data: VCard): void => {
+    const vCardData = [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
+        `FN:${data.name}`,
+        `TEL:${data.phone}`,
+        `TEL:${data.altPhone}`,
+        `EMAIL:${data.email}`,
+        `URL:${data.facebook}`,
+        `ADR;TYPE=home:;;${data.street};${data.state};${data.city};${data.country};`,
+        "END:VCARD"
+    ].join("\n");
+
+    const blob = new Blob([vCardData], { type: "text/vcard" });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${data.name}.vcf`;
+    link.click();
+};
 
   // Đảm bảo rằng bạn gọi hook này mỗi lần render
   if (!vcard) return <motion.div
@@ -149,6 +168,7 @@ export default function VcardClientComponent({ username }: { username: string })
                                     variant="ghost"
                                     className="px-2 py-1 font-semibold border cursor-pointer border-white/50 text-white hover:text-black hover:bg-white rounded-md flex items-center gap-2 transition-colors duration-200"
                                     style={{fontSize: '0.7rem'}}
+                                    onClick={() => {handleContact(vcard)}}
                                     >
                                     <FaPlus  style={{width: '0.5rem' , height: '.5rem'}} />
                                     Add Contact
